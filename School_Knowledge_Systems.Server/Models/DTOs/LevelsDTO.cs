@@ -31,4 +31,11 @@
             };
         }
     }
+    public class LevelsDTOUpdate
+    {
+        public int AssignedStudents { get; set; }
+        public int UnAssignedStudents { get; set; }
+
+    }
+
 }

@@ -13,6 +13,7 @@ namespace School_Knowledge_Systems.Server.Models.Services
         {
             _context = context;
         }
+
         public async Task<LevelsDTO> DeleteLevel(string id)
         {
             if (_context.Levels == null)
@@ -31,9 +32,15 @@ namespace School_Knowledge_Systems.Server.Models.Services
             return (LevelsDTO)level;
         }
 
-        public Task<LevelsDTO> GetLevel(string levelId)
+        public async Task<LevelsDTO> GetLevel(string levelId)
         {
-            throw new NotImplementedException();
+            if (_context.Levels == null)
+            {
+                return null;
+            }
+            var level = await _context.Levels.FindAsync(levelId);
+
+            return (LevelsDTO)level;
         }
 
         public async Task<IEnumerable<LevelsDTO>> GetLevels()
@@ -42,12 +49,15 @@ namespace School_Knowledge_Systems.Server.Models.Services
             {
                 return null;
             }
-            return (IEnumerable<LevelsDTO>)await _context.Levels.ToListAsync();
+            var levelsList = await _context.Levels.ToListAsync();
+            IEnumerable<LevelsDTO> IEnumLevels = levelsList.Select(level => (LevelsDTO)level);
+            return IEnumLevels;
         }
 
-        public Task<bool> LevelExists(string id)
+        public async Task<bool?> LevelExists(string id)
         {
-            throw new NotImplementedException();
+            var exists = _context.Levels?.Any(e => e.ClassID == id);
+            return exists;
         }
 
         public async Task<LevelsDTO> PostLevel(LevelsDTO level)
@@ -59,7 +69,7 @@ namespace School_Knowledge_Systems.Server.Models.Services
             }
             catch (DbUpdateException)
             {
-                if (await LevelExists(level.ClassID))
+                if (await LevelExists(level.ClassID) == false)
                 {
                     return null;
                 }
@@ -71,9 +81,32 @@ namespace School_Knowledge_Systems.Server.Models.Services
             return level;
         }
 
-        public Task<LevelsDTO> PutLevel(string id, LevelsDTO level)
+        public async Task<LevelsDTO> PutLevel(string id, LevelsDTOUpdate level)
         {
-            throw new NotImplementedException();
+            var currentLevel = await _context.Levels.FindAsync(id);
+
+            currentLevel.AssignedStudents = level.AssignedStudents;
+            currentLevel.UnAssignedStudents = level.UnAssignedStudents;
+
+            _context.Entry(currentLevel).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (await LevelExists(id) == false)
+                {
+                    return null;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return (LevelsDTO)currentLevel;
         }
     }
 }

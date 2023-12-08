@@ -8,8 +8,7 @@ namespace School_Knowledge_Systems.Server.Models
         public string ClassID { get; set; }
         public int AssignedStudents { get; set; }
         public int UnAssignedStudents { get; set; }
-
-        public List<Section> Sections { get; set; }
+        public IEnumerable<Section> Sections { get; set; }
 
         public Level()
         {

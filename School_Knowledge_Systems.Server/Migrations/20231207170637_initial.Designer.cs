@@ -11,7 +11,7 @@ using School_Knowledge_Systems.Server.Data;
 namespace School_Knowledge_Systems.Server.Migrations
 {
     [DbContext(typeof(SKSDbContext))]
-    [Migration("20231207170344_initial")]
+    [Migration("20231207170637_initial")]
     partial class initial
     {
         /// <inheritdoc />

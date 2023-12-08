@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using School_Knowledge_Systems.Server.Data;
 using School_Knowledge_Systems.Server.Models;
 using School_Knowledge_Systems.Server.Models.DTOs;
@@ -32,49 +31,18 @@ namespace School_Knowledge_Systems.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Level>> GetLevel(string id)
         {
-            if (_context.Levels == null)
-            {
-                return NotFound();
-            }
-            var level = await _context.Levels.FindAsync(id);
+            var Level = await _levels.GetLevel(id);
+            return Level != null ? Ok(Level) : NotFound();
 
-            if (level == null)
-            {
-                return NotFound();
-            }
-
-            return level;
         }
 
         // PUT: api/Levels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutLevel(string id, Level level)
+        public async Task<IActionResult> PutLevel(string id, LevelsDTOUpdate level)
         {
-            if (id != level.ClassID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(level).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LevelExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var updatedLevel = await _levels.PutLevel(id, level);
+            return updatedLevel != null ? Ok(updatedLevel) : NotFound();
         }
 
         // POST: api/Levels
@@ -93,11 +61,6 @@ namespace School_Knowledge_Systems.Server.Controllers
         {
             var categories = await _levels.DeleteLevel(id);
             return categories != null ? Ok(categories) : NotFound();
-        }
-
-        private bool LevelExists(string id)
-        {
-            return (_context.Levels?.Any(e => e.ClassID == id)).GetValueOrDefault();
         }
     }
 }
